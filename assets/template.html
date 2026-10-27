@@ -1,0 +1,82 @@
+<!doctype html>
+<!--
+  paper-bilingual-html 模板骨架（英→中对照阅读译稿）
+  用法：以本文件为骨架，把正文逐段填入 .pair 结构（左 .en 英文原文 / 右 .zh 中文译文）。
+  图片占位符 FIG1 ... FIGn 由 scripts/build_html.py 注入 base64。
+  每个结构块下方都有"可复制示例"，照抄结构即可；不要改动 <style> 与 <script>。
+-->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{中文标题}} · 中英对照</title>
+<style>::root{--ink:#193144;--muted:#617484;--accent:#0e746e;--paper:#fff;--line:#dce5e9;--bg:#f4f7f8;--size:17px}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:95px}body{margin:0;background:var(--bg);color:var(--ink);font:var(--size)/1.85 "Segoe UI","Microsoft YaHei",sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}button,select{font:14px "Microsoft YaHei",sans-serif;cursor:pointer;border:1px solid #bfd0d6;border-radius:7px;background:white;color:var(--ink);padding:8px 12px}button:hover{background:#eaf5f3}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #29a399;outline-offset:3px}.toolbar{position:sticky;top:0;z-index:10;background:#fffffff5;border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px)}.brand{font-size:14px;font-weight:650;margin-right:auto;color:var(--accent)}.progress{height:3px;background:var(--accent);position:fixed;top:0;left:0;z-index:20;width:0}.shell{max-width:1580px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;padding:35px 26px}.sidebar{position:sticky;top:90px;max-height:calc(100vh - 115px);overflow:auto;align-self:start;font-size:13px;padding-right:10px}.sidebar h2{font-size:14px;letter-spacing:2px;color:var(--muted);margin:0 0 12px}.sidebar a{display:block;color:#435d6d;padding:5px 9px;border-left:2px solid transparent;line-height:1.5}.sidebar a:hover{background:#e4efed;border-left-color:var(--accent);text-decoration:none}.sidebar .level-2{font-weight:700;margin-top:10px}.sidebar .level-3{padding-left:19px}.sidebar .level-4{padding-left:29px;font-size:12px}.paper{background:var(--paper);padding:48px 42px;border:1px solid var(--line);border-radius:12px;min-width:0;box-shadow:0 6px 25px #17374505}.kicker{color:var(--accent);font-size:12px;letter-spacing:2px;font-weight:700}h1{font:700 31px/1.4 "Microsoft YaHei",sans-serif;margin:14px 0 12px}.title-en{font:23px/1.4 Georgia,serif;color:#4d6577;max-width:900px}.byline{font-size:15px;color:var(--muted);margin:20px 0}.metadata{font-size:13px;line-height:1.8;border-top:1px solid var(--line);padding-top:16px}.reader-note{background:#edf6f4;border-left:3px solid var(--accent);padding:15px 18px;font-size:14px;line-height:1.8;margin:24px 0}.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}.en{font-family:Georgia,"Times New Roman",serif;color:#405361;line-height:1.8;overflow-wrap:anywhere}.zh{line-height:1.95;overflow-wrap:anywhere}.pair>.zh{border-left:1px solid var(--line);padding-left:25px}.pair p{margin:0}.block{padding:23px 0;border-bottom:1px solid #edf0f2}.page-link{display:block;text-align:right;font:11px/1.5 "Microsoft YaHei",sans-serif;color:#778997;margin-bottom:9px}h2{font-size:26px;border-top:2px solid var(--accent);padding-top:25px;margin-top:55px}h3{font-size:22px;margin-top:34px}h4{font-size:18px;margin-top:26px}h2,h3,h4{line-height:1.4}.heading-en{display:block;font-size:.74em;font-weight:400;margin-top:7px}.visual{background:#fafcfc;border:1px solid var(--line);border-radius:9px;padding:20px;margin:25px 0}.caption{font-size:15px;font-weight:600;margin-bottom:18px}.chart{display:block;max-width:100%;height:auto;margin:auto}.figure-key,.table-note{font-size:12px;line-height:1.6;color:var(--muted);margin:12px 0 0}.table-scroll{overflow-x:auto;max-width:100%;margin-top:12px}table{border-collapse:collapse;width:100%;font-size:12px;line-height:1.6;min-width:560px;font-variant-numeric:tabular-nums}th,td{border:1px solid #d5e0e5;padding:9px 10px;text-align:right}th{background:#e8f2f0;font-weight:650;text-align:center}td:first-child{text-align:left}tbody tr:nth-child(even){background:#f2f6f7}td:empty:after{content:""}.editor-note{font:13px/1.8 "Microsoft YaHei",sans-serif;border-left:3px solid #d4b379;background:#fcf7ee;padding:12px 16px;color:#72592f}.ref{font-size:14px}.ref .pair{gap:22px}.glossary{font-size:14px;background:#f0f5f7;border-radius:8px;padding:15px 20px;margin:25px 0}.glossary summary{cursor:pointer;font-weight:600}.glossary dl{display:grid;grid-template-columns:210px 1fr;gap:8px 15px}.glossary dt{font-weight:600}.glossary dd{margin:0}.prompt-code{font:12.5px/1.55 Consolas,"Courier New",monospace;background:#0f1b22;color:#d7e3ea;padding:16px 18px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:0}.fn .en,.fn .zh{font-size:13px;color:var(--muted)}.footer{font-size:12px;color:var(--muted);margin-top:35px}.mode-zh .en,.mode-en .zh{display:none}.mode-zh .pair,.mode-en .pair{grid-template-columns:1fr}.mode-zh .pair>.zh{border:0;padding-left:0}.stacked .pair{grid-template-columns:1fr;gap:16px}.stacked .pair>.zh{border-left:3px solid #b6d6cf;padding-left:18px}@media(max-width:1050px){.shell{grid-template-columns:1fr;padding:20px 14px}.sidebar{position:static;max-height:230px;background:white;padding:15px;border:1px solid var(--line);border-radius:8px}.paper{padding:30px 24px}.toolbar{flex-wrap:wrap;padding:10px 14px}.brand{flex-basis:100%;margin:0}.pair{gap:20px}}@media(max-width:700px){.pair{grid-template-columns:1fr;gap:18px}.pair>.zh{border-left:3px solid #b6d6cf;padding-left:16px}.paper{padding:24px 18px}h1{font-size:25px}.title-en{font-size:19px}.visual{padding:13px}.glossary dl{grid-template-columns:1fr}.glossary dd{margin-bottom:10px}}@media print{body{background:white;font-size:11pt}.toolbar,.sidebar,.progress,.page-link{display:none}.shell{display:block;padding:0;max-width:none}.paper{border:0;box-shadow:none;padding:0}h2,h3,h4{break-after:avoid}.visual{break-inside:avoid}.chart{max-height:180mm}.pair{gap:18px}table{min-width:0;font-size:8pt}th,td{padding:4px}a{color:inherit}.reader-note{font-size:9pt}.prompt-code{white-space:pre-wrap}}</style></head><body>
+<div class="progress" id="progress"></div>
+<header class="toolbar"><span class="brand">论文阅读 · 中英对照</span><label for="mode">语言</label><select id="mode"><option value="both">中英对照</option><option value="zh">仅中文</option><option value="en">仅英文</option></select><button id="layout" type="button" aria-pressed="false">上下对照</button><button id="smaller" type="button" aria-label="缩小字号">A−</button><button id="larger" type="button" aria-label="增大字号">A+</button><button id="print" type="button">打印 / 保存 PDF</button></header>
+<div class="shell">
+<nav class="sidebar" aria-label="论文目录"><h2>目录 / CONTENTS</h2>
+  <!-- 目录：一级节用 class="level-2"，二级 class="level-3"，三级 class="level-4"。示例： -->
+  <a href="#abstract">摘要</a>
+  <a class="level-2" href="#s1">1 标题一</a>
+  <a class="level-3" href="#s1-1">1.1 标题二</a>
+  <a class="level-2" href="#refs">参考文献</a>
+  <a href="#glossary">术语对照</a>
+</nav>
+<main class="paper">
+  <!-- 眉题（期刊/卷期/DOI） -->
+  <div class="kicker">{{期刊名 卷期页码 · DOI}}</div>
+
+  <!-- 标题：中文 h1.zh + 英文 .title-en.en -->
+  <h1 class="zh">{{中文标题}}</h1>
+  <div class="title-en en">{{English Title}}</div>
+
+  <!-- 作者：保留原文拼写，仅对 100% 确定的中文名音译 -->
+  <div class="byline">{{作者列表}}</div>
+
+  <!-- 单位：每个单位一个 .pair（左英文 / 右中文） -->
+  <div class="metadata">
+    <div class="pair "><div class="en" lang="en"><p>{{Affiliation 1 (EN)}}</p></div><div class="zh" lang="zh-CN"><p>{{单位 1（中文）}}</p></div></div>
+    <!-- 逐条追加更多单位 pair -->
+    <p>{{收稿/接收日期 · 原文 PDF 链接}}</p>
+  </div>
+
+  <!-- 译稿说明 -->
+  <div class="reader-note">{{基于本地 N 页 PDF 整理的全文中英对照阅读译稿说明，含刊名卷期 DOI，注明数值/图表/论述保留}}</div>
+
+  <!-- 摘要：一个 .pair 段落 -->
+  <div id="abstract"><article class="block p" id="b0"><a class="page-link" href="{{pdf文件名}}#page=1">原文第 1 页 ↗</a><div class="pair "><div class="en" lang="en"><p>{{Abstract (EN)}}</p></div><div class="zh" lang="zh-CN"><p>摘要：{{Abstract (中文)}}</p></div></div></article></div>
+
+  <!-- 关键词 -->
+  <div class="pair "><div class="en" lang="en"><p><strong>Keywords:</strong> {{...}}</p></div><div class="zh" lang="zh-CN"><p><strong>关键词：</strong>{{...}}</p></div></div>
+
+  <!-- 一级节标题：h2 + 中文 span.zh + 英文 span.en.heading-en -->
+  <h2 id="s1"><span class="zh">{{1 节中文标题}}</span><span class="en heading-en">{{1 Section English Title}}</span></h2>
+
+  <!-- 正文段落：每个段落一个 article.block.pair，左英文原文 / 右中文译文。逐段复制此结构。 -->
+  <article class="block p" id="b1"><a class="page-link" href="{{pdf文件名}}#page=N">原文第 N 页 ↗</a><div class="pair "><div class="en" lang="en"><p>{{Paragraph (EN)}}</p></div><div class="zh" lang="zh-CN"><p>{{段落（中文译文）}}</p></div></div></article>
+
+  <!-- 二级节标题 -->
+  <h3 id="s1-1"><span class="zh">{{1.1 中文标题}}</span><span class="en heading-en">{{1.1 English Title}}</span></h3>
+
+  <!-- 图：visual + 双语图题 caption + 内嵌图 {{FIGn}} -->
+  <section class="visual" id="fig1" aria-label="图 1：{{中文图题}}"><div class="pair caption"><div class="en" lang="en"><p>Fig.1 {{English caption}}</p></div><div class="zh" lang="zh-CN"><p>图 1：{{中文图题}}</p></div></div><img class="chart" src="data:image/jpeg;base64,{{FIG1}}" alt="图 1：{{中文图题}}"></section>
+
+  <!-- 表格（如论文含表）：双语表头 + 保留原数值。表头单元格用 "English / 中文" 格式。 -->
+  <section class="visual" id="tab1" aria-label="表 1：{{中文表题}}"><div class="pair caption"><div class="en" lang="en"><p>Table 1 {{English caption}}</p></div><div class="zh" lang="zh-CN"><p>表 1：{{中文表题}}</p></div></div><div class="table-scroll"><table><thead><tr><th scope="col">{{Col1 EN}} / {{列1}}</th><th scope="col">{{Col2 EN}} / {{列2}}</th></tr></thead><tbody><tr><td>{{val}}</td><td>{{val}}</td></tr></tbody></table></div></section>
+
+  <!-- 译注（独立说明用 .editor-note） -->
+  <p class="editor-note">{{译注内容，例如：个别无法完整还原的文献条目请以原刊为准}}</p>
+
+  <!-- 参考文献：每条一个 article.block.ref，左英文原文 / 右 [n] 题名译文 -->
+  <h2 id="refs"><span class="zh">参考文献</span><span class="en heading-en">References</span></h2>
+  <p class="editor-note">参考文献保留完整英文条目，逐条提供题名的中文译文；作者、期刊与会议名称、卷期页码等书目信息保留原文，便于检索。</p>
+  <article class="block ref" id="r1"><a class="page-link" href="{{pdf文件名}}#page=N">原文第 N 页起 ↗</a><div class="pair "><div class="en" lang="en"><p>{{Reference 1 (EN full)}}</p></div><div class="zh" lang="zh-CN"><p>[1] 题名译文：{{...}}</p></div></div></article>
+
+  <!-- 术语对照表：details.glossary + summary + dl(dt/dd) -->
+  <details class="glossary" id="glossary"><summary>常用术语对照</summary><dl><dt>{{term EN}} / {{术语}}</dt><dd>{{解释}}</dd></dl></details>
+
+  <footer class="footer">{{原文版权 · 期刊卷期页码 DOI · 非官方译本声明}}</footer>
+</main></div>
+<script>
+const mode=document.querySelector('#mode');mode.addEventListener('change',()=>{document.body.classList.remove('mode-en','mode-zh');if(mode.value!=='both')document.body.classList.add('mode-'+mode.value)});
+document.querySelector('#layout').addEventListener('click',e=>{const on=document.body.classList.toggle('stacked');e.currentTarget.textContent=on?'左右对照':'上下对照';e.currentTarget.setAttribute('aria-pressed',String(on))});
+let size=17;const resize=delta=>{size=Math.max(13,Math.min(24,size+delta));document.documentElement.style.setProperty('--size',size+'px')};document.querySelector('#smaller').onclick=()=>resize(-1);document.querySelector('#larger').onclick=()=>resize(1);document.querySelector('#print').onclick=()=>window.print();
+function progress(){const max=document.documentElement.scrollHeight-innerHeight;document.querySelector('#progress').style.width=(max>0?scrollY/max*100:0)+'%'}window.addEventListener('scroll',progress,{passive:true});window.addEventListener('resize',progress);progress();
+</script></body></html>
