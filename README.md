@@ -1,5 +1,15 @@
 # skills
-paper-bilingual-html
+
+CodeBuddy 技能集合。每个子目录是一个独立 skill，放入 `~/.codebuddy/skills/` 即可使用。
+
+| 技能 | 说明 |
+|------|------|
+| [paper-bilingual-html](./paper-bilingual-html/) | 将英文论文 PDF 翻译为「中英对照 HTML」阅读译稿 |
+| [quiz-web-builder](./quiz-web-builder/) | 将试题材料（PDF/PPTX/DOCX）做成可交互答题网页，支持错题筛选、收藏、笔记 |
+
+---
+
+## paper-bilingual-html
 
 请把下面这篇论文翻译成【中英对照版 HTML】，严格仿照我给的示例文件排版。
 

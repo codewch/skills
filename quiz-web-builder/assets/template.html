@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>答题网页</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#fff;
+    --primary:#4f46e5; --primary-dark:#4338ca; --primary-soft:#eef2ff;
+    --success:#16a34a; --success-soft:#f0fdf4;
+    --danger:#dc2626; --danger-soft:#fef2f2;
+    --star:#f59e0b; --text:#1f2430; --muted:#6b7280; --line:#e5e7eb;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+    background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 45%,#fdf4ff 100%);color:var(--text);min-height:100vh;}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px 60px;}
+
+  header.top{background:var(--card);border-radius:var(--radius);padding:22px 24px;box-shadow:0 6px 24px rgba(79,70,229,.08);margin-bottom:18px;}
+  .top h1{margin:0 0 6px;font-size:22px;}
+  .top .sub{color:var(--muted);font-size:13px;line-height:1.7;}
+  .stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;}
+  .stat{flex:1;min-width:100px;background:var(--primary-soft);border-radius:12px;padding:12px 14px;}
+  .stat .k{font-size:12px;color:var(--muted);}
+  .stat .v{font-size:20px;font-weight:700;color:var(--primary);margin-top:2px;}
+  .bar{height:8px;background:#e5e7eb;border-radius:99px;margin-top:16px;overflow:hidden;}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#22d3ee);border-radius:99px;transition:width .35s;}
+
+  .filters{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap;}
+  .chip{padding:9px 16px;background:var(--card);border:1px solid var(--line);border-radius:99px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--muted);transition:.2s;}
+  .chip:hover{border-color:#a5b4fc;color:var(--primary);}
+  .chip.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,.25);}
+  .chip .cnt{opacity:.75;font-weight:500;}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 6px 24px rgba(15,23,42,.06);margin-bottom:18px;}
+  .qhead{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .qno{background:var(--primary);color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;}
+  .qtype{font-size:12px;color:var(--muted);background:#f3f4f6;padding:4px 10px;border-radius:99px;}
+  .qtype.multi{background:#fef3c7;color:#b45309;}
+  .qtype.fill{background:#e0f2fe;color:#0369a1;}
+  .star{margin-left:auto;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:15px;color:var(--muted);transition:.2s;}
+  .star:hover{border-color:#fcd34d;color:var(--star);}
+  .star.on{border-color:var(--star);color:var(--star);background:#fffbeb;}
+
+  .stem{font-size:17px;line-height:1.85;margin:6px 0 18px;white-space:pre-wrap;}
+  .stem input.blank-input{width:180px;max-width:100%;padding:5px 10px;font-size:16px;font-family:inherit;border:none;border-bottom:2px solid var(--primary);background:#f5f6ff;color:var(--primary-dark);font-weight:600;text-align:center;outline:none;border-radius:6px 6px 0 0;transition:.18s;}
+  .stem input.blank-input:focus{background:#fff;box-shadow:0 2px 0 var(--primary);}
+  .stem input.blank-input.ok{background:var(--success-soft);border-color:var(--success);color:var(--success);}
+  .stem input.blank-input.bad{background:var(--danger-soft);border-color:var(--danger);color:var(--danger);}
+
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;transition:.18s;background:#fff;line-height:1.6;}
+  .opt:hover{border-color:#a5b4fc;background:#fafaff;}
+  .opt .letter{flex:0 0 26px;height:26px;line-height:24px;text-align:center;border:1.5px solid var(--line);border-radius:8px;font-weight:700;font-size:14px;color:var(--muted);}
+  .opt .txt{flex:1;font-size:15.5px;}
+  .opt.selected{border-color:var(--primary);background:var(--primary-soft);}
+  .opt.selected .letter{border-color:var(--primary);background:var(--primary);color:#fff;}
+  .opt.correct{border-color:var(--success);background:var(--success-soft);}
+  .opt.correct .letter{border-color:var(--success);background:var(--success);color:#fff;}
+  .opt.wrong{border-color:var(--danger);background:var(--danger-soft);}
+  .opt.wrong .letter{border-color:var(--danger);background:var(--danger);color:#fff;}
+  .opt.locked{cursor:default;}
+  .opt.locked:hover{border-color:var(--line);background:#fff;}
+  .opt.locked.correct:hover{border-color:var(--success);background:var(--success-soft);}
+  .opt.locked.wrong:hover{border-color:var(--danger);background:var(--danger-soft);}
+
+  .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+  button{font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:12px;padding:12px 22px;cursor:pointer;transition:.18s;}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,.28);}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--muted);}
+  .btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+  .btn-ghost:disabled{opacity:.45;cursor:not-allowed;}
+
+  .result{margin-top:20px;border-radius:14px;padding:18px;display:none;animation:fade .28s;}
+  .result.show{display:block;}
+  .result.ok{background:var(--success-soft);border:1px solid #bbf7d0;}
+  .result.bad{background:var(--danger-soft);border:1px solid #fecaca;}
+  .result .verdict{font-weight:700;font-size:16px;}
+  .result.ok .verdict{color:var(--success);}
+  .result.bad .verdict{color:var(--danger);}
+  .kv{margin-top:12px;font-size:14.5px;line-height:1.9;}
+  .kv .label{color:var(--muted);font-weight:600;margin-right:6px;}
+  .kv .ans{color:var(--success);font-weight:700;}
+  .kv .mine{color:var(--danger);font-weight:700;}
+  .kv .skip{color:#9ca3af;}
+  .analysis{margin-top:14px;padding-top:14px;border-top:1px dashed rgba(0,0,0,.12);font-size:14.5px;line-height:1.85;color:#374151;}
+  .analysis .t{font-weight:700;color:var(--primary);display:block;margin-bottom:4px;}
+
+  .note-box{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;}
+  .note-box .lbl{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .note-box textarea{width:100%;min-height:64px;resize:vertical;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;line-height:1.6;outline:none;transition:.18s;color:var(--text);}
+  .note-box textarea:focus{border-color:var(--primary);background:#fafaff;}
+
+  .footbar{display:flex;justify-content:space-between;margin-top:18px;gap:10px;}
+  .footbar button{flex:1;}
+  .nav-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 6px 24px rgba(15,23,42,.06);}
+  .nav-card h3{margin:0 0 14px;font-size:16px;}
+  .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;}
+  @media(max-width:640px){.grid{grid-template-columns:repeat(5,1fr);}}
+  .cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1.5px solid var(--line);font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;position:relative;}
+  .cell:hover{border-color:var(--primary);color:var(--primary);}
+  .cell.done{background:var(--success);border-color:var(--success);color:#fff;}
+  .cell.bad{background:var(--danger);border-color:var(--danger);color:#fff;}
+  .cell.current{outline:2.5px solid var(--primary);outline-offset:1px;}
+  .cell .starmark{position:absolute;top:2px;right:4px;font-size:9px;color:#fbbf24;}
+  .cell.done .starmark,.cell.bad .starmark{color:#fff;}
+  .legend{display:flex;gap:16px;margin-top:14px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;align-items:center;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px;}
+
+  .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:99;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  @keyframes fade{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 id="h1">答题练习</h1>
+    <div class="sub" id="sub"></div>
+    <div class="stats">
+      <div class="stat"><div class="k">已作答</div><div class="v" id="s-done">0</div></div>
+      <div class="stat"><div class="k">正确</div><div class="v" id="s-right">0</div></div>
+      <div class="stat"><div class="k">错误</div><div class="v" id="s-wrong">0</div></div>
+      <div class="stat"><div class="k">正确率</div><div class="v" id="s-rate">—</div></div>
+    </div>
+    <div class="bar"><i id="s-bar"></i></div>
+  </header>
+
+  <div class="filters" id="filters">
+    <div class="chip active" data-f="all">全部<span class="cnt"></span></div>
+    <div class="chip" data-f="wrong">错题<span class="cnt"></span></div>
+    <div class="chip" data-f="star">收藏<span class="cnt"></span></div>
+  </div>
+
+  <section class="card">
+    <div class="qhead">
+      <span class="qno" id="qno"></span>
+      <span class="qtype" id="qtype"></span>
+      <button class="star" id="btn-star" title="收藏本题">☆ 收藏</button>
+    </div>
+    <div class="stem" id="stem"></div>
+    <div class="opts" id="opts"></div>
+    <div class="actions">
+      <button class="btn-primary" id="btn-submit">提交答案</button>
+      <button class="btn-ghost" id="btn-next" style="display:none">下一题 →</button>
+      <button class="btn-ghost" id="btn-reset">重做本题</button>
+    </div>
+    <div class="result" id="result">
+      <div class="verdict" id="verdict"></div>
+      <div class="kv" id="kv"></div>
+      <div class="analysis"><span class="t">解析</span><span id="analysis"></span></div>
+    </div>
+    <div class="note-box">
+      <div class="lbl">📝 我的笔记</div>
+      <textarea id="note" placeholder="记录这道题的易错点、记忆技巧…"></textarea>
+    </div>
+  </section>
+
+  <div class="footbar">
+    <button class="btn-ghost" id="btn-prev">← 上一题</button>
+    <button class="btn-ghost" id="btn-jump-next">下一题 →</button>
+  </div>
+
+  <div class="nav-card">
+    <h3>答题卡</h3>
+    <div class="grid" id="grid"></div>
+    <div class="legend">
+      <span><i style="background:#16a34a"></i>正确</span>
+      <span><i style="background:#dc2626"></i>错误</span>
+      <span><i style="background:#fff;border:1.5px solid #e5e7eb"></i>未作答</span>
+      <span><i style="background:#fbbf24"></i>已收藏</span>
+      <span style="margin-left:auto"><button class="btn-ghost" id="btn-clear" style="padding:7px 14px;font-size:13px">清空记录</button></span>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   配置
+   ========================================================= */
+const TITLE = '答题练习';          // 页面大标题
+const SUBTITLE = '';               // 副标题/说明
+const STORE_KEY = 'quiz_v1';       // localStorage 键名（不同试卷需改成不同值）
+const REQUIRE_ALL_BLANKS = false;  // 多空填空是否要求全部填对才算对（false=只判定已填的空）
+
+/* =========================================================
+   题库（在此粘贴/填写 Q 数组）
+   数据格式：
+   {id, type, q, o, a, ex}
+   - type: 'choice' 单选  -> a 为选项下标(0 起)
+   - type: 'multi'  多选  -> a 为下标数组 [0,1]
+   - type: 'fill'   填空  -> q 中用 ______ 标记空位，a 为可接受答案：
+       单空  a:['答案1','答案2']
+       多空  a:[['空1答案A','空1答案B'], ['空2答案A']]
+   ========================================================= */
+const Q = [
+  // TODO: 在此粘贴题库数据
+];
+
+/* =========================================================
+   逻辑（一般无需修改）
+   ========================================================= */
+let state = JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+let curId = Q.length ? Q[0].id : 1;
+let filter = 'all';
+const TOTAL = Q.length;
+const L=['A','B','C','D','E','F','G'];
+const $=s=>document.querySelector(s);
+const save=()=>localStorage.setItem(STORE_KEY,JSON.stringify(state));
+
+function norm(s){
+  return String(s).toLowerCase().trim()
+    .replace(/[.,;:!?。"'’“”()]/g,'')
+    .replace(/\s+/g,' ')
+    .replace(/^(the|a|an)\s+/,'');
+}
+function list(){
+  if(filter==='all') return Q;
+  if(filter==='wrong') return Q.filter(q=> state[q.id] && state[q.id].ok===false);
+  if(filter==='star') return Q.filter(q=> state[q.id] && state[q.id].star);
+  return Q;
+}
+const getRec=id=>state[id]||{};
+
+function renderStats(){
+  const done=Object.values(state).filter(v=>v.pick!==undefined).length;
+  const right=Object.values(state).filter(v=>v.ok===true).length;
+  const wrong=Object.values(state).filter(v=>v.ok===false).length;
+  $('#s-done').textContent=done+' / '+TOTAL;
+  $('#s-right').textContent=right;
+  $('#s-wrong').textContent=wrong;
+  $('#s-rate').textContent=done?Math.round(right/done*100)+'%':'—';
+  $('#s-bar').style.width=(done/TOTAL*100)+'%';
+  document.querySelector('.chip[data-f="wrong"] .cnt').textContent='（'+wrong+'）';
+  document.querySelector('.chip[data-f="star"] .cnt').textContent='（'+Object.values(state).filter(v=>v.star).length+'）';
+  $('#h1').textContent=TITLE;
+  $('#sub').textContent=SUBTITLE;
+}
+
+function renderGrid(){
+  const g=$('#grid'); g.innerHTML='';
+  const ls=list();
+  ls.forEach(q=>{
+    const d=document.createElement('div');
+    d.className='cell';
+    const rec=getRec(q.id);
+    if(rec.ok===true) d.classList.add('done');
+    else if(rec.ok===false) d.classList.add('bad');
+    if(q.id===curId) d.classList.add('current');
+    if(rec.star) d.innerHTML='<span class="starmark">★</span>';
+    d.appendChild(document.createTextNode(q.id));
+    d.title='第 '+q.id+' 题';
+    d.onclick=()=>go(q.id);
+    g.appendChild(d);
+  });
+  if(!ls.length) g.innerHTML='<div style="grid-column:1/-1;color:#9ca3af;padding:20px 0;text-align:center">暂无题目</div>';
+}
+
+function render(){
+  const q=Q.find(x=>x.id===curId);
+  const rec=getRec(q.id);
+  const submitted=rec.pick!==undefined;
+
+  $('#qno').textContent='第 '+q.id+' 题';
+  const qt=$('#qtype');
+  const TN={choice:'单选题',multi:'多选题',fill:'填空题'};
+  qt.textContent=TN[q.type]||'题目';
+  qt.className='qtype '+(q.type||'');
+
+  const star=$('#btn-star');
+  star.textContent=(rec.star?'★':'☆')+' 收藏';
+  star.classList.toggle('on', !!rec.star);
+
+  const stem=$('#stem'); stem.innerHTML='';
+  const opts=$('#opts'); opts.innerHTML='';
+
+  if(q.type==='choice' || q.type==='multi'){
+    stem.textContent=q.q;
+    opts.style.display='flex';
+    q.o.forEach((t,i)=>{
+      const d=document.createElement('div');
+      d.className='opt'+(submitted?' locked':'');
+      d.dataset.i=i;
+      d.innerHTML='<div class="letter">'+L[i]+'</div><div class="txt">'+t+'</div>';
+      if(!submitted){
+        d.onclick=()=>{
+          if(q.type==='choice'){ opts.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected')); d.classList.add('selected'); }
+          else d.classList.toggle('selected');
+        };
+      }
+      opts.appendChild(d);
+    });
+    if(submitted){
+      const ansArr = q.type==='choice' ? [q.a] : q.a;
+      const pickArr = q.type==='choice' ? [rec.pick] : rec.pick;
+      opts.querySelectorAll('.opt').forEach(o=>{
+        const i=+o.dataset.i;
+        if(ansArr.includes(i)) o.classList.add('correct');
+        else if(pickArr.includes(i)) o.classList.add('wrong');
+      });
+    }
+  } else {
+    opts.style.display='none';
+    const segs=q.q.split(/_{3,}/);
+    segs.forEach((s,i)=>{
+      stem.appendChild(document.createTextNode(s));
+      if(i<segs.length-1){
+        const inp=document.createElement('input');
+        inp.className='blank-input'; inp.type='text'; inp.placeholder='填空'; inp.autocomplete='off';
+        inp.disabled=submitted;
+        stem.appendChild(inp);
+      }
+    });
+    if(submitted){
+      const inputs=[...stem.querySelectorAll('input')];
+      inputs.forEach((inp,k)=>{
+        const mine=(rec.pick||[])[k]||'';
+        inp.value=mine;
+        if(mine===''){ inp.placeholder='未填'; return; }
+        const ok=q.a[k].some(x=>norm(x)===norm(mine));
+        inp.classList.add(ok?'ok':'bad');
+      });
+    }
+  }
+
+  const r=$('#result');
+  if(submitted) showResult(q,rec); else { r.className='result'; $('#btn-next').style.display='none'; }
+  $('#btn-submit').style.display=submitted?'none':'';
+  $('#note').value=rec.note||'';
+
+  const ls=list(); const idx=ls.findIndex(x=>x.id===curId);
+  $('#btn-prev').disabled=!(idx>0);
+  $('#btn-jump-next').disabled=!(idx>=0 && idx<ls.length-1);
+
+  renderGrid(); renderStats();
+}
+
+function showResult(q,rec){
+  const r=$('#result');
+  r.className='result show '+(rec.ok?'ok':'bad');
+  $('#verdict').textContent=rec.ok?'✓ 回答正确':'✗ 回答错误';
+  let kvHtml='';
+  if(q.type==='choice' || q.type==='multi'){
+    const ansArr = q.type==='choice' ? [q.a] : q.a;
+    const pickArr = q.type==='choice' ? [rec.pick] : rec.pick;
+    const std=ansArr.map(i=>L[i]+'. '+q.o[i]).join('　｜　');
+    if(!rec.ok){
+      const mine=pickArr.map(i=>L[i]+'. '+q.o[i]).join('　｜　');
+      kvHtml+='<span class="label">你的答案</span><span class="mine">'+mine+'</span><br>';
+    }
+    kvHtml+='<span class="label">正确答案</span><span class="ans">'+std+'</span>';
+  } else {
+    const n=q.a.length;
+    let mine=[], std=[];
+    for(let k=0;k<n;k++){
+      const v=(rec.pick||[])[k]||'';
+      if(!v){ mine.push('<span class="skip">('+(k+1)+') 未填</span>'); }
+      else{
+        const hit=q.a[k].some(x=>norm(x)===norm(v));
+        mine.push('<span class="'+(hit?'ans':'mine')+'">('+(k+1)+') '+v+' '+(hit?'✓':'✗')+'</span>');
+      }
+      std.push('('+(k+1)+') '+q.a[k].join(' / '));
+    }
+    kvHtml+='<span class="label">你的答案</span>'+mine.join('　')+'<br>';
+    kvHtml+='<span class="label">参考答案</span><span class="ans">'+std.join('　')+'</span>';
+  }
+  $('#kv').innerHTML=kvHtml;
+  $('#analysis').textContent=q.ex||'（暂无解析）';
+  const ls=list(); const i=ls.findIndex(x=>x.id===q.id);
+  $('#btn-next').style.display = i<ls.length-1 ? '' : 'none';
+}
+
+function go(id){ curId=id; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ---------- 提交 ---------- */
+$('#btn-submit').onclick=()=>{
+  const q=Q.find(x=>x.id===curId);
+  const rec=getRec(q.id);
+  let pick, ok;
+  if(q.type==='choice'){
+    const sel=$('#opts').querySelector('.opt.selected');
+    if(!sel){ toast('请先选择一个选项'); return; }
+    pick=+sel.dataset.i; ok=pick===q.a;
+  } else if(q.type==='multi'){
+    const sels=[...$('#opts').querySelectorAll('.opt.selected')].map(o=>+o.dataset.i).sort();
+    if(!sels.length){ toast('请至少选择一个选项'); return; }
+    pick=sels;
+    ok=sels.length===q.a.length && sels.every((v,i)=>v===q.a[i]);
+  } else {
+    const inputs=[...$('#stem').querySelectorAll('input')];
+    const vals=inputs.map(i=>i.value.trim());
+    if(vals.every(v=>!v)){ toast('请至少填写一个空'); return; }
+    pick=vals;
+    if(REQUIRE_ALL_BLANKS){
+      ok=vals.every((v,k)=> v!=='' && q.a[k].some(x=>norm(x)===norm(v)));
+    } else {
+      ok=vals.every((v,k)=> v==='' || q.a[k].some(x=>norm(x)===norm(v)));  // 已填的空正确即算对，未填跳过
+    }
+  }
+  state[q.id]=Object.assign({}, rec, {pick, ok});
+  save(); render(); toast(ok?'回答正确 ✓':'回答错误，已显示答案与解析');
+};
+
+$('#btn-reset').onclick=()=>{
+  const rec=getRec(curId);
+  const keep={};
+  if(rec.note!==undefined) keep.note=rec.note;
+  if(rec.star) keep.star=true;
+  if(Object.keys(keep).length) state[curId]=keep; else delete state[curId];
+  save(); render(); toast('本题已重置');
+};
+
+$('#btn-star').onclick=()=>{
+  const rec=getRec(curId);
+  state[curId]=Object.assign({}, rec, {star: !rec.star});
+  save(); render(); toast(state[curId].star?'已收藏 ★':'已取消收藏');
+};
+
+$('#note').addEventListener('input', e=>{
+  const rec=getRec(curId);
+  state[curId]=Object.assign({}, rec, {note: e.target.value});
+  save();
+});
+
+document.querySelectorAll('.chip').forEach(c=>{
+  c.onclick=()=>{
+    filter=c.dataset.f;
+    document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active', x===c));
+    const ls=list();
+    curId = ls.length ? ls[0].id : curId;
+    render();
+  };
+});
+
+$('#btn-next').onclick=()=>{ const ls=list(); const i=ls.findIndex(x=>x.id===curId); if(i<ls.length-1) go(ls[i+1].id); };
+$('#btn-jump-next').onclick=$('#btn-next').onclick;
+$('#btn-prev').onclick=()=>{ const ls=list(); const i=ls.findIndex(x=>x.id===curId); if(i>0) go(ls[i-1].id); };
+
+$('#btn-clear').onclick=()=>{
+  if(confirm('确定清空全部答题记录、收藏与笔记？')){ state={}; save(); filter='all'; curId=Q.length?Q[0].id:1; render(); toast('已清空'); }
+};
+
+let tid;
+function toast(msg){
+  const el=$('#toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(tid); tid=setTimeout(()=>el.classList.remove('show'),1900);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.activeElement && document.activeElement.classList.contains('blank-input')){
+    if(!state[curId] || state[curId].pick===undefined) $('#btn-submit').click();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
